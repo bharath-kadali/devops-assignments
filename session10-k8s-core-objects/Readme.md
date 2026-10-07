@@ -1,9 +1,9 @@
 # Session 10: Kubernetes Core Objects
 
-**Author:** [Bharath Kadali]
-**Course:** SST DevOps & Cloud [SWE]
-**Session:** 10 - Kubernetes Core Objects
-**Repository:** devops-heros / session10-k8s-core-objects
+**Author:** [Bharath Kadali]  
+**Course:** SST DevOps & Cloud [SWE]  
+**Session:** 10 - Kubernetes Core Objects  
+**Repository:** devops-heros / session10-k8s-core-objects  
 
 ---
 
@@ -19,7 +19,7 @@ kubectl get nodes -o wide
 ```
 
 **Screenshot:**
-`![Cluster Health](./screenshots/01-cluster-health.png)`
+![Cluster Health](./screenshots/01-cluster-health.png)
 
 ---
 
@@ -38,7 +38,7 @@ kubectl get pods
 ```
 
 **Screenshot:**
-`![Nginx Pod Operations](./screenshots/02-nginx-pod-operations.png)`
+![Nginx Pod Operations](./screenshots/02-nginx-pod-operations.png)
 
 ---
 
@@ -55,7 +55,7 @@ kubectl delete -f pod-lifecycle/06-imagepullbackoff.yaml
 ```
 
 **Screenshot:**
-`![ImagePullBackOff Error](./screenshots/03-imagepullbackoff-error.png)`
+![ImagePullBackOff Error](./screenshots/03-imagepullbackoff-error.png)
 
 ---
 
@@ -76,7 +76,7 @@ kubectl delete -f hello.yml
 ```
 
 **Screenshot:**
-`![Pod Lifecycle Stages](./screenshots/04-pod-lifecycle-stages.png)`
+![Pod Lifecycle Stages](./screenshots/04-pod-lifecycle-stages.png)
 
 ---
 
@@ -92,8 +92,8 @@ cd pod-lifecycle/
 ```
 
 **Screenshots:**
-`![Lifecycle Probes & Crashloop](./screenshots/05-lifecycle-probes-crashloop.png)`
-`![Init & Multi-Container](./screenshots/05-lifecycle-init-multicontainer.png)`
+![Lifecycle Probes & Crashloop](./screenshots/05-lifecycle-probes-crashloop.png)
+![Init & Multi-Container](./screenshots/05-lifecycle-init-multicontainer.png)
 
 ---
 
@@ -111,7 +111,7 @@ kubectl get pods -l app=mysql
 ```
 
 **Screenshot:**
-`![Controllers RS and StatefulSet](./screenshots/06-controllers-rs-statefulset.png)`
+![Controllers RS and StatefulSet](./screenshots/06-controllers-rs-statefulset.png)
 
 ---
 
@@ -127,7 +127,7 @@ kubectl get pods -l app=node-exporter -o wide
 ```
 
 **Screenshot:**
-`![DaemonSet Verification](./screenshots/07-daemonset-verification.png)`
+![DaemonSet Verification](./screenshots/07-daemonset-verification.png)
 
 ---
 
@@ -146,7 +146,7 @@ kubectl rollout undo deployment/app-rolling
 ```
 
 **Screenshot:**
-`![Rolling Update and Rollback](./screenshots/08-rolling-update-and-rollback.png)`
+![Rolling Update and Rollback](./screenshots/08-rolling-update-and-rollback.png)
 
 ---
 
@@ -164,7 +164,7 @@ kubectl rollout undo deployment/yatri-backend
 ```
 
 **Screenshot:**
-`![Troubleshooting Drills](./screenshots/09-troubleshooting-drills.png)`
+![Troubleshooting Drills](./screenshots/09-troubleshooting-drills.png)
 
 ---
 
@@ -213,7 +213,7 @@ kubectl apply -f service-green.yaml
 ```
 
 **Screenshot:**
-`![Blue-Green Cutover](./screenshots/11-blue-green-cutover.png)`
+![Blue-Green Cutover](./screenshots/11-blue-green-cutover.png)
 
 ---
 
@@ -231,7 +231,7 @@ kubectl apply -f deployment-canary.yaml
 ```
 
 **Screenshot:**
-`![Canary Traffic Split](./screenshots/12-canary-traffic-split.png)`
+![Canary Traffic Split](./screenshots/12-canary-traffic-split.png)
 
 ---
 
@@ -249,4 +249,4 @@ kubectl apply -f deployment-v2.yaml
 ```
 
 **Screenshot:**
-`![Recreate Downtime Outage](./screenshots/13-recreate-downtime-outage.png)`
+![Recreate Downtime Outage](./screenshots/13-recreate-downtime-outage.png)

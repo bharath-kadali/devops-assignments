@@ -1,9 +1,9 @@
 # Session 11: Kubernetes Services
 
-**Author:** [Bharath Kadali]
-**Course:** SST DevOps & Cloud [SWE]
-**Session:** 11 - Kubernetes Services
-**Repository:** devops-heros / session-11-kubernetes-services
+**Author:** [Bharath Kadali]  
+**Course:** SST DevOps & Cloud [SWE]  
+**Session:** 11 - Kubernetes Services  
+**Repository:** devops-heros / session-11-kubernetes-services  
 
 ---
 
@@ -23,7 +23,7 @@ Client Browser ──► [nodePort: 30080] (Host IP)
 ```
 
 **Screenshot:**
-`![Port Architecture](./screenshots/01-port-architecture.png)`
+![Port Architecture](./screenshots/01-port-architecture.png)
 
 ---
 
@@ -41,8 +41,8 @@ kubectl exec -it curl-client -- curl -s http://web-service-clusterip:8080
 ```
 
 **Screenshots:**
-`![ClusterIP Service](./screenshots/02-clusterip-service.png)`
-`![ClusterIP Execution](./screenshots/02-clusterip-execution.png)`
+![ClusterIP Service](./screenshots/02-clusterip-service.png)
+![ClusterIP Execution](./screenshots/02-clusterip-execution.png)
 
 ---
 
@@ -59,8 +59,8 @@ curl -I http://${MINIKUBE_IP}:30080
 ```
 
 **Screenshots:**
-`![NodePort Output](./screenshots/03-nodeport-service.png)`
-`![NodePort Execution](./screenshots/03-nodeport-execution.png)`
+![NodePort Output](./screenshots/03-nodeport-service.png)
+![NodePort Execution](./screenshots/03-nodeport-execution.png)
 
 ---
 
@@ -76,8 +76,8 @@ kubectl get svc web-service-loadbalancer
 ```
 
 **Screenshots:**
-`![LoadBalancer Service](./screenshots/04-loadbalancer-service.png)`
-`![LoadBalancer Execution](./screenshots/04-loadbalancer-execution.png)`
+![LoadBalancer Service](./screenshots/04-loadbalancer-service.png)
+![LoadBalancer Execution](./screenshots/04-loadbalancer-execution.png)
 
 ---
 
@@ -93,8 +93,8 @@ kubectl exec -it dns-test-client -- nslookup external-database-service
 ```
 
 **Screenshots:**
-`![ExternalName Service](./screenshots/05-externalname-service.png)`
-`![ExternalName Output](./screenshots/05-externalname-output.png)`
+![ExternalName Service](./screenshots/05-externalname-service.png)
+![ExternalName Output](./screenshots/05-externalname-output.png)
 
 ---
 
@@ -110,8 +110,8 @@ kubectl exec -it headless-dns-client -- nslookup web-service-headless
 ```
 
 **Screenshots:**
-`![Headless Output](./screenshots/06-headless-output.png)`
-`![Headless Execution](./screenshots/06-headless-execution.png)`
+![Headless Output](./screenshots/06-headless-output.png)
+![Headless Execution](./screenshots/06-headless-execution.png)
 
 ---
 
@@ -125,8 +125,8 @@ kubectl get endpoints external-legacy-db
 ```
 
 **Screenshots:**
-`![Empty Endpoints](./screenshots/07-empty-endpoints.png)`
-`![Manual Endpoints Map](./screenshots/07-manual-endpoints.png)`
+![Empty Endpoints](./screenshots/07-empty-endpoints.png)
+![Manual Endpoints Map](./screenshots/07-manual-endpoints.png)
 
 ---
 
@@ -140,8 +140,8 @@ kubectl exec -it curl-client -- nslookup web-service-clusterip
 ```
 
 **Screenshots:**
-`![Resolv Conf Output](./screenshots/08-resolv-conf.png)`
-`![CoreDNS nslookup](./screenshots/08-coredns-nslookup.png)`
+![Resolv Conf Output](./screenshots/08-resolv-conf.png)
+![CoreDNS nslookup](./screenshots/08-coredns-nslookup.png)
 
 ---
 
@@ -153,8 +153,8 @@ kubectl exec -it curl-client -- nslookup web-service-clusterip
 ```
 
 **Screenshots:**
-`![Pre Delete Stats](./screenshots/09-pre-delete-stats.png)`
-`![Post Delete Stats](./screenshots/09-post-delete-stats.png)`
+![Pre Delete Stats](./screenshots/09-pre-delete-stats.png)
+![Post Delete Stats](./screenshots/09-post-delete-stats.png)
 
 ---
 
@@ -171,7 +171,7 @@ kubectl exec -it curl-client -- nslookup web-service-clusterip
 | **Scaling Behavior** | Scales arbitrarily across healthy nodes | Scales ordinally (adds/removes at the tail) | Scales automatically when nodes join/leave |
 
 **Screenshot:**
-`![Matrix Output](./screenshots/10-architectural-matrix.png)`
+![Matrix Output](./screenshots/10-architectural-matrix.png)
 
 ---
 
@@ -194,7 +194,7 @@ Need to expose service outside cluster?
 ```
 
 **Screenshot:**
-`![Cost Optimization Tree](./screenshots/11-cost-optimization-tree.png)`
+![Cost Optimization Tree](./screenshots/11-cost-optimization-tree.png)
 
 ---
 
@@ -211,5 +211,5 @@ minikube service web-service-nodeport --url
 ```
 
 **Screenshots:**
-`![Direct Node Failure](./screenshots/12-direct-node-failure.png)`
-`![Minikube Tunnel Solution](./screenshots/12-minikube-tunnel.png)`
+![Direct Node Failure](./screenshots/12-direct-node-failure.png)
+![Minikube Tunnel Solution](./screenshots/12-minikube-tunnel.png)
