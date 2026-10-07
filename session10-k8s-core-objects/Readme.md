@@ -1,6 +1,6 @@
 # Session 10: Kubernetes Core Objects
 
-**Author:** [Your Name]
+**Author:** [Bharath Kadali]
 **Course:** SST DevOps & Cloud [SWE]
 **Session:** 10 - Kubernetes Core Objects
 **Repository:** devops-heros / session10-k8s-core-objects

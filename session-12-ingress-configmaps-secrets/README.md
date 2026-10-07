@@ -1,6 +1,6 @@
 # Session 12: Ingress, ConfigMaps & Secrets
 
-**Author:** [Your Name]
+**Author:** [Bharath Kadali]
 **Course:** SST DevOps & Cloud [SWE]
 **Session:** 12 - Ingress, ConfigMaps & Secrets
 **Repository:** devops-heros / session-12-ingress-configmaps-secrets
@@ -17,7 +17,7 @@ kubectl get configmap yatri-app-config -o jsonpath='{.data.ENVIRONMENT}'
 ```
 
 **Screenshot:**
-`![ConfigMap Outputs](./screenshots/01-configmap-output.png)`
+![ConfigMap Outputs](./screenshots/01-configmap-output.png)
 
 ---
 
@@ -32,7 +32,7 @@ kubectl exec -it deploy/yatri-backend -- env | grep ENVIRONMENT
 ```
 
 **Screenshot:**
-`![ConfigMap Live Update](./screenshots/02-configmap-update.png)`
+![ConfigMap Live Update](./screenshots/02-configmap-update.png)
 
 ---
 
@@ -46,7 +46,7 @@ kubectl get secret yatri-db-secret -o jsonpath='{.data.POSTGRES_PASSWORD}' | bas
 ```
 
 **Screenshot:**
-`![Kubernetes Secret Validation](./screenshots/03-secret-validation.png)`
+![Kubernetes Secret Validation](./screenshots/03-secret-validation.png)
 
 ---
 
@@ -59,7 +59,7 @@ echo -n "secretpassword" | base64
 ```
 
 **Screenshot:**
-`![Newline Gotcha Analysis](./screenshots/04-newline-gotcha.png)`
+![Newline Gotcha Analysis](./screenshots/04-newline-gotcha.png)
 
 ---
 
@@ -71,7 +71,7 @@ echo -n "secretpassword" | base64
 3. **CI/CD Integration**: Pipelines inject secrets at deploy-time using variables instead of storing them statically.
 
 **Screenshot:**
-`![Secret Management Operators](./screenshots/05-enterprise-secrets.png)`
+![Secret Management Operators](./screenshots/05-enterprise-secrets.png)
 
 ---
 
@@ -87,7 +87,7 @@ kubectl exec -it deploy/yatri-backend -- env | grep -E "ENVIRONMENT|LOG_LEVEL|PO
 ```
 
 **Screenshot:**
-`![Combined Injection Pod](./screenshots/06-combined-injection.png)`
+![Combined Injection Pod](./screenshots/06-combined-injection.png)
 
 ---
 
@@ -99,7 +99,7 @@ kubectl exec -it deploy/yatri-backend -- env | grep -E "ENVIRONMENT|LOG_LEVEL|PO
 | **Ingress Controller** | Active reverse proxy pod (NGINX, Traefik, HAProxy, Envoy) that runs a control loop, dynamically generates proxy configuration, and routes traffic. |
 
 **Screenshot:**
-`![Ingress Comparison](./screenshots/07-ingress-comparison.png)`
+![Ingress Comparison](./screenshots/07-ingress-comparison.png)
 
 ---
 
@@ -115,7 +115,7 @@ kubectl wait --namespace ingress-nginx \
 ```
 
 **Screenshot:**
-`![Ingress Controller Enable](./screenshots/08-ingress-enable.png)`
+![Ingress Controller Enable](./screenshots/08-ingress-enable.png)
 
 ---
 
@@ -128,7 +128,7 @@ echo "${MINIKUBE_IP}  yatri.local" | sudo tee -a /etc/hosts
 ```
 
 **Screenshot:**
-`![Local DNS Map](./screenshots/09-local-dns-mapping.png)`
+![Local DNS Map](./screenshots/09-local-dns-mapping.png)
 
 ---
 
@@ -143,7 +143,7 @@ curl -s http://yatri.local/api/
 ```
 
 **Screenshot:**
-`![Path Routing Check](./screenshots/10-path-routing.png)`
+![Path Routing Check](./screenshots/10-path-routing.png)
 
 ---
 
@@ -156,7 +156,7 @@ curl -s -H "Host: api.campus.local" http://${MINIKUBE_IP}/api/
 ```
 
 **Screenshot:**
-`![Subdomain Routing](./screenshots/11-subdomain-routing.png)`
+![Subdomain Routing](./screenshots/11-subdomain-routing.png)
 
 ---
 
@@ -170,7 +170,7 @@ kubectl describe ingress campus-ingress-tls
 ```
 
 **Screenshot:**
-`![Hybrid Routing Verification](./screenshots/12-hybrid-routing.png)`
+![Hybrid Routing Verification](./screenshots/12-hybrid-routing.png)
 
 ---
 
@@ -186,7 +186,7 @@ curl -k -v --resolve portal.campus.local:443:${INGRESS_IP} https://portal.campus
 ```
 
 **Screenshot:**
-`![TLS Setup](./screenshots/13-tls-setup.png)`
+![TLS Setup](./screenshots/13-tls-setup.png)
 
 ---
 
@@ -200,4 +200,4 @@ bash 04-full-demo/cleanup.sh
 ```
 
 **Screenshot:**
-`![End To End Automation](./screenshots/14-end-to-end-demo.png)`
+![End To End Automation](./screenshots/14-end-to-end-demo.png)

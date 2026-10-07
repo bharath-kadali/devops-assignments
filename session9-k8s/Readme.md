@@ -1,6 +1,6 @@
 # Session 9: Kubernetes Fundamentals & Cluster Architecture
 
-**Author:** [Your Name]
+**Author:** [Bharath Kadali]
 **Course:** SST DevOps & Cloud [SWE]
 **Session:** 09 - Kubernetes Fundamentals
 **Repository:** devops-heros / session9-k8s
@@ -17,12 +17,10 @@ minikube version
 kubectl version --client
 ```
 
-**Output:**
-> (Please run the command and insert your output here)
 
 **Screenshot:**
 
-`![Minikube and Kubectl Version](./screenshots/01-version-check.png)`
+![Minikube and Kubectl Version](./screenshots/01-version-check.png)
 
 ---
 
@@ -36,12 +34,10 @@ Initialize the local single-node Kubernetes cluster using the containerized runt
 minikube start
 ```
 
-**Output:**
-> (Please run the command and insert your output here)
 
 **Screenshot:**
 
-`![Minikube Start](./screenshots/02-minikube-start.png)`
+![Minikube Start](./screenshots/02-minikube-start.png)
 
 ---
 
@@ -56,12 +52,10 @@ minikube status
 kubectl get nodes -o wide
 ```
 
-**Output:**
-> (Please run the command and insert your output here)
 
 **Screenshot:**
 
-`![Minikube Status and Nodes](./screenshots/03-minikube-status.png)`
+![Minikube Status and Nodes](./screenshots/03-minikube-status.png)
 
 ---
 
@@ -76,12 +70,11 @@ minikube stop
 minikube status
 ```
 
-**Output:**
-> (Please run the command and insert your output here)
+
 
 **Screenshot:**
 
-`![Minikube Stop](./screenshots/04-minikube-stop.png)`
+![Minikube Stop](./screenshots/04-minikube-stop.png)
 
 ---
 
