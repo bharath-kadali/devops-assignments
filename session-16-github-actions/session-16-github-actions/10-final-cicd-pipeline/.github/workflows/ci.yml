@@ -1,4 +1,4 @@
-name: Final CI Pipeline
+name: Final CI/CD Pipeline
 on:
   push:
     branches:
@@ -7,66 +7,116 @@ on:
     branches:
       - main
   workflow_dispatch:
+
 jobs:
+  # ---------------- CI STAGE: TEST ----------------
   test:
     name: Test Application
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
+
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
       - name: Display Python version
         run: python --version
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run tests
+          pip install pytest
+
+      - name: Run unit tests
         run: |
           pytest -v
+
+  # ---------------- CI STAGE: BUILD & ARTIFACT ----------------
   build:
     name: Build Application
     needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
+
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Build application
+
+      - name: Build application package
         run: |
           chmod +x build.sh
           ./build.sh
+
       - name: Show build output
         run: |
           cat build/build-info.txt
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: calculator-build
           path: build/
+
+  # ---------------- CI STAGE: SECURITY AUDIT ----------------
   security-check:
-    name: Security Check
+    name: Security & Secret Scan
     needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v6
-      - name: Check for sensitive files
+        uses: actions/checkout@v4
+
+      - name: Scan for sensitive credentials
         run: |
-          echo "Checking repository for common sensitive files..."
-          if find . -type f \( \
-            -name ".env" \
-            -o -name "*.pem" \
-            -o -name "*.key" \
-          \) | grep -q .; then
-            echo "Potential sensitive file found."
+          echo "Scanning for sensitive credentials, keys, or .env files..."
+          if find . -type f \( -name ".env" -o -name "*.pem" -o -name "*.key" \) | grep -q .; then
+            echo "::error::Potential sensitive file found!"
             exit 1
           else
-            echo "No common sensitive files found."
+            echo "Security check passed: No exposed secret files found."
           fi
+
+  # ---------------- CD STAGE: CONTAINER PACKAGE ----------------
+  docker-build:
+    name: Docker Build & Package
+    needs: [build, security-check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/calculator-app:${{ github.sha }} .
+          docker tag ghcr.io/${{ github.repository_owner }}/calculator-app:${{ github.sha }} ghcr.io/${{ github.repository_owner }}/calculator-app:latest
+
+  # ---------------- CD STAGE: DEPLOYMENT ----------------
+  deploy:
+    name: Deploy to Production
+    needs: docker-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Simulate Production Deployment
+        env:
+          DEPLOY_ENVIRONMENT: production
+          APP_VERSION: ${{ github.sha }}
+        run: |
+          echo "=========================================="
+          echo "Deploying to Environment: $DEPLOY_ENVIRONMENT"
+          echo "Deploying Image Version:  $APP_VERSION"
+          echo "Deployment successful!"
+          echo "=========================================="

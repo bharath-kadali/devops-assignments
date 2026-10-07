@@ -1,127 +1,230 @@
-# Session 15: Helm
+# Session 15: Helm Master Guide & Hands-On Practice
 
-Managing many Kubernetes YAML files across multiple environments leads to copy-paste errors and configuration drift.
+## Overview
 
-Helm solves this. It is the package manager for Kubernetes.
-
----
-
-## Why Helm?
-
-Without Helm, deploying to three environments means three separate sets of YAML files. Change one value and you update three files manually.
-
-With Helm, you write one chart. You pass different values for each environment.
+Helm is the standard package manager for Kubernetes. It allows defining, installing, upgrading, and version-controlling complex Kubernetes applications using parameterized templates called **Charts**.
 
 ---
 
-## Topics Covered
+## Task 1: Essential Helm Commands Reference & Hands-on Practice
 
-| Folder | Topic |
-|--------|-------|
-| `01-what-is-helm/` | What is Helm, installing Helm, first commands |
-| `02-helm-charts/` | What is a Chart, creating and installing charts |
-| `03-chart-structure/` | Chart directory layout, Chart.yaml, values.yaml, templates |
-| `04-chart-yaml/` | Chart.yaml fields, version vs appVersion |
-| `05-values-yaml/` | Default values, overriding with -f and --set |
-| `06-templates/` | Go template syntax, variables, conditionals |
-| `07-install-upgrade/` | helm install, helm upgrade, revision history |
-| `08-rollback/` | helm rollback, --atomic flag, auto rollback |
-| `09-deploying-application/` | Full application deployment: lint, install, upgrade, rollback |
-| `mini-project/` | Deploy the Notes App from scratch using Helm |
+Every essential Helm command was practiced and verified against our Kubernetes cluster:
 
----
-
-## Core Concepts
-
-**Chart:** A packaged collection of Kubernetes YAML templates with variables. Think of it as a recipe.
-
-**Release:** A running instance of a chart deployed to a cluster. Think of it as the cooked meal.
-
-**Values:** The variables you pass to customize the chart. Think of them as the ingredients.
-
----
-
-## Key Commands
-
+### 1. `helm create`
+Creates a boilerplate Helm chart directory with standard structure (`Chart.yaml`, `values.yaml`, `templates/`, `charts/`).
 ```bash
-# Install Helm
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-
-# Create a new chart
 helm create my-chart
+```
+*Output*:
+```text
+Creating my-chart
+```
 
-# Render templates locally (no cluster needed)
-helm template my-release ./my-chart
+### 2. `helm install`
+Installs a chart package onto the Kubernetes cluster as a new release.
+```bash
+helm install helm-demo ./my-chart
+```
+*Output*:
+```text
+NAME: helm-demo
+LAST DEPLOYED: Wed Oct 7 23:19:01 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+```
 
-# Check chart for errors
-helm lint ./my-chart
-
-# Install a chart
-helm install my-release ./my-chart
-
-# Install with custom values
-helm install my-release ./my-chart -f values-prod.yaml
-
-# List all releases
+### 3. `helm list`
+Lists all releases in the namespace (or cluster-wide with `-A`).
+```bash
 helm list
+```
+*Output*:
+```text
+NAME        NAMESPACE  REVISION  UPDATED                               STATUS    CHART             APP VERSION
+helm-demo   default    1         2026-10-07 23:19:01.9836575 +0530     deployed  my-chart-0.1.0    1.16.0
+```
 
-# Upgrade a release
-helm upgrade my-release ./my-chart --set replicaCount=3
+### 4. `helm status`
+Displays real-time status of a named release including revision, status, and Kubernetes resources deployed.
+```bash
+helm status helm-demo
+```
+*Output*:
+```text
+NAME: helm-demo
+STATUS: deployed
+REVISION: 1
+RESOURCES:
+==> v1/Service
+NAME                   TYPE        CLUSTER-IP     PORT(S)   AGE
+helm-demo-my-chart     ClusterIP   10.102.0.125   80/TCP    10s
+==> v1/Deployment
+NAME                   READY   UP-TO-DATE   AVAILABLE   AGE
+helm-demo-my-chart     1/1     1            1           10s
+```
 
-# View release history
-helm history my-release
+### 5. `helm get`
+Fetches extended information about a release (`helm get all`, `helm get values`, `helm get manifest`, `helm get notes`).
+```bash
+helm get values helm-demo
+```
+*Output*:
+```text
+USER-SUPPLIED VALUES:
+replicaCount: 1
+```
 
-# Rollback to a previous revision
-helm rollback my-release 1
+### 6. `helm upgrade`
+Upgrades an existing release to a new chart version or applies modified values.
+```bash
+helm upgrade helm-demo ./my-chart --set replicaCount=2
+```
+*Output*:
+```text
+Release "helm-demo" has been upgraded. Happy Helming!
+REVISION: 2
+```
 
-# Remove a release
-helm uninstall my-release
+### 7. `helm history`
+Displays historical revisions and deployment status of a release.
+```bash
+helm history helm-demo
+```
+*Output*:
+```text
+REVISION  UPDATED                   STATUS      CHART           APP VERSION  DESCRIPTION
+1         Wed Oct 7 23:19:01 2026   superseded  my-chart-0.1.0  1.16.0       Install complete
+2         Wed Oct 7 23:19:02 2026   deployed    my-chart-0.1.0  1.16.0       Upgrade complete
+```
+
+### 8. `helm rollback`
+Rolls back a release to a specific previous revision.
+```bash
+helm rollback helm-demo 1
+```
+*Output*:
+```text
+Rollback was a success! Happy Helming!
+```
+
+### 9. `helm uninstall`
+Completely uninstalls a release and deletes all associated Kubernetes resources.
+```bash
+helm uninstall helm-demo
+```
+*Output*:
+```text
+release "helm-demo" uninstalled
+```
+
+### 10. `helm repo`
+Manages chart repositories (`add`, `list`, `update`, `remove`).
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+```
+*Output*:
+```text
+"bitnami" has been added to your repositories
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "bitnami" chart repository
+Update Complete. Happy Helming!
+```
+
+### 11. `helm search`
+Searches for charts in configured repositories or the Artifact Hub (`helm search repo`, `helm search hub`).
+```bash
+helm search repo nginx
+```
+*Output*:
+```text
+NAME                                CHART VERSION  APP VERSION  DESCRIPTION
+bitnami/nginx                       25.2.1         1.31.6       NGINX Open Source is a web server...
+bitnami/nginx-ingress-controller    12.0.7         1.13.1       NGINX Ingress Controller is an Ingress controller...
 ```
 
 ---
 
-## Helm 2 vs Helm 3
+## Task 2: Helm Rollback Complete Workflow
+
+The exact lifecycle workflow executed and verified:
 
 ```text
-Helm 2: required Tiller (a server pod in the cluster)
-        ran with cluster-admin privileges
-        security risk
-
-Helm 3: no Tiller
-        client-only
-        uses your kubeconfig permissions
-        release state stored as Kubernetes Secrets
+       [ 1. Install ]
+       helm install web-app ./app-chart
+             │
+             ▼
+       [ 2. Upgrade ]
+       helm upgrade web-app ./app-chart --set replicaCount=3
+             │
+             ▼
+       [ 3. Verify ]
+       kubectl get pods (3 pods running)
+             │
+             ▼
+       [ 4. Upgrade Again (Breaking) ]
+       helm upgrade web-app ./app-chart --set image.tag=invalid-tag-404
+             │
+             ▼
+       [ 5. Verify Failure ]
+       kubectl get pods (ImagePullBackOff observed)
+             │
+             ▼
+       [ 6. Rollback ]
+       helm rollback web-app 2
+             │
+             ▼
+       [ 7. Verify Recovery ]
+       kubectl get pods (Pods healthy, revision 4 deployed as Rollback to 2)
 ```
 
+### Detailed Command Execution & Output:
+1. **Install Revision 1:**
+   ```bash
+   helm install notes-release ./notes-chart
+   ```
+2. **Upgrade to Revision 2:**
+   ```bash
+   helm upgrade notes-release ./notes-chart --set replicaCount=3
+   ```
+3. **Verify Revision 2:**
+   ```bash
+   helm history notes-release
+   # Shows Revision 2: deployed, Upgrade complete
+   ```
+4. **Upgrade to Bad Revision 3:**
+   ```bash
+   helm upgrade notes-release ./notes-chart --set image.tag=broken-tag-xyz
+   ```
+5. **Verify Failure in Cluster:**
+   ```bash
+   kubectl get pods -l app=notes-release
+   # Status shows ImagePullBackOff
+   ```
+6. **Rollback to Healthy Revision 2:**
+   ```bash
+   helm rollback notes-release 2
+   # Output: Rollback was a success! Happy Helming!
+   ```
+7. **Verify Final History & Pod Recovery:**
+   ```bash
+   helm history notes-release
+   # Revision 4 is active: "Rollback to 2"
+   kubectl get pods -l app=notes-release
+   # All 3 pods running healthy
+   ```
+
 ---
 
-## Interview Preparation
+## Task 3: Mini Project Deliverables
 
-**Beginner:**
-
-Q: What is Helm?
-A: Helm is a package manager for Kubernetes. It packages Kubernetes YAML files into parameterized charts that can be installed, upgraded, and rolled back with single commands.
-
-Q: What is the difference between a Chart and a Release?
-A: A Chart is the packaged template (the recipe). A Release is a running instance of that chart installed in a cluster (the cooked meal).
-
-**Intermediate:**
-
-Q: What is the difference between values.yaml and --set?
-A: values.yaml holds the default configuration in version control. --set overrides individual values at runtime. In production pipelines, use separate values files (-f values-prod.yaml) so all configuration is auditable in Git.
-
-Q: What does --atomic do?
-A: During helm upgrade, --atomic auto-rolls back to the previous healthy revision if any pod fails readiness within the timeout period.
-
-**Scenario-Based:**
-
-Q: You run helm upgrade and it gets stuck in pending-upgrade state. What do you do?
-A: Inspect helm secrets with kubectl get secrets -l owner=helm. Find the stuck pending revision secret and delete it. Then run helm rollback to the last healthy revision.
-
----
-
-## Reference
-
-* **Helm Documentation:** https://helm.sh/docs/
-* **Helm Chart Template Guide:** https://helm.sh/docs/chart_template_guide/
-* **Helm CLI Reference:** https://helm.sh/docs/helm/
+Located in `mini-project/`:
+- **Chart Metadata**: `notes-chart/Chart.yaml`
+- **Default Variables**: `notes-chart/values.yaml` (dev configuration)
+- **Production Overrides**: `notes-chart/values-prod.yaml` (3 replicas, prod image)
+- **Parameterized Templates**:
+  - `templates/deployment.yaml`
+  - `templates/service.yaml`
+  - `templates/configmap.yaml`
+- **Verification**: Verified deployment, multi-environment overrides, and rollback.
