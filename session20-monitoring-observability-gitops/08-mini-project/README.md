@@ -1,394 +1,202 @@
-# 08 - Session 20 Mini Project
+# 08 - Session 20 Mini Project: GitOps with ArgoCD
 
-You will combine:
+## Overview
+
+A complete GitOps mini-project demonstrating:
 
 ```text
-Kubernetes
-+
-Git
-+
-GitOps
-+
-Argo CD
+Git → ArgoCD → Kubernetes → Application
 ```
 
-The goal:
+ArgoCD continuously reconciles the cluster state against the desired state in Git.
+
+---
+
+## Architecture
 
 ```text
-Git
- |
- | desired state
- v
-Argo CD
- |
- | automatic sync
- v
-Kubernetes
- |
- v
-Application
+              Developer
+                  |
+                  | git push
+                  v
+            Git Repository
+            (bharath-kadali/devops-assignments)
+                  |
+            session20-monitoring-observability-gitops/08-mini-project/app/
+                  |
+                  | Polls every 3 minutes
+                  v
+           ┌─────────────────────┐
+           │       ArgoCD        │
+           │   namespace: argocd │
+           │   (Reconciler)      │
+           └──────────┬──────────┘
+                      |
+                      v
+               Kubernetes
+              namespace: session20
+                      |
+          ┌───────────┴───────────┐
+          |                       |
+      Deployment              Service
+      (2 replicas)          (ClusterIP:80)
+          |
+        Pods (nginx:1.27-alpine)
 ```
 
 ---
 
-# Requirements
+## Resources in This Project
 
-Build a small application with:
-
-```text
-Namespace
-Deployment
-Service
-Argo CD Application
-```
-
-The Deployment should have:
-
-```text
-replicas: 2
-```
+| File | Kind | Purpose |
+|:-----|:-----|:--------|
+| `app/namespace.yaml` | Namespace | Creates `session20` namespace |
+| `app/deployment.yaml` | Deployment | 2 nginx replicas |
+| `app/service.yaml` | Service | ClusterIP exposing port 80 |
+| `app/argocd-application.yaml` | Application | ArgoCD Application object (applied once) |
 
 ---
 
-# Step 1 - Create Cluster
-
-```bash
-kind create cluster --name session20
-```
-
-Check:
-
-```bash
-kubectl get nodes
-```
-
-Expected:
-
-```text
-NAME
-session20-control-plane
-```
-
----
-
-# Step 2 - Install Argo CD
+## Step 1 — Install ArgoCD
 
 ```bash
 kubectl create namespace argocd
-```
 
-Then:
-
-```bash
-kubectl apply -n argocd \
+kubectl apply -n argocd --server-side --force-conflicts \
   -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
 
-Wait:
+Wait for all pods to be `Running`:
 
 ```bash
-kubectl get pods -n argocd
+kubectl get pods -n argocd -w
+```
+
+**Live Output:**
+
+```text
+NAME                                                READY   STATUS    RESTARTS   AGE
+argocd-application-controller-0                     1/1     Running   0          3m12s
+argocd-applicationset-controller-76fd8cdd4f-zdvjp   1/1     Running   0          3m15s
+argocd-dex-server-66c78cf887-kcz5r                  1/1     Running   0          3m15s
+argocd-notifications-controller-7fb9868fd6-qncrw    1/1     Running   0          3m15s
+argocd-redis-bdbdffcb4-s4nlj                        1/1     Running   0          3m15s
+argocd-repo-server-d89c7967d-mnddd                  1/1     Running   0          3m13s
+argocd-server-776b7cdd4d-bjqzm                      1/1     Running   0          3m13s
 ```
 
 ---
 
-# Step 3 - Create a Git Repository
-
-Create a repository on GitHub/GitLab/Bitbucket.
-
-Copy these application manifests into the Git repository:
-
-```text
-namespace.yaml
-deployment.yaml
-service.yaml
-```
-
-Your Git repository should contain:
-
-```text
-app/
-|
-|-- namespace.yaml
-|-- deployment.yaml
-|-- service.yaml
-```
-
-Keep this teaching project's `argocd-application.yaml` outside the Git `app/` path. The Application object tells Argo CD which repository/path to watch; it should not be rendered as one of the workload manifests from that same path.
-
----
-
-# Step 4 - Change Repository URL
-
-Open:
-
-```text
-app/argocd-application.yaml
-```
-
-Replace:
-
-```text
-https://github.com/YOUR_USERNAME/YOUR_GITOPS_REPO.git
-```
-
-with your actual repository URL.
-
-Commit and push.
-
----
-
-# Step 5 - Create Application
-
-Apply the Argo CD Application:
+## Step 2 — Apply the ArgoCD Application
 
 ```bash
 kubectl apply -f app/argocd-application.yaml
 ```
 
-Check:
+**Output:**
+
+```text
+application.argoproj.io/session20-mini created
+```
+
+---
+
+## Step 3 — Verify Sync & Deployment
 
 ```bash
 kubectl get applications -n argocd
+kubectl get all -n session20
 ```
 
-Expected shape:
+**Live Output:**
 
 ```text
 NAME             SYNC STATUS   HEALTH STATUS
 session20-mini   Synced        Healthy
+
+NAME                                  READY   STATUS    RESTARTS   AGE
+pod/session20-mini-68946db7dd-x4m8j   1/1     Running   0          11m
+pod/session20-mini-68946db7dd-xsxvn   1/1     Running   0          11m
+
+NAME                     TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+service/session20-mini   ClusterIP   10.110.229.54   <none>        80/TCP    11m
+
+NAME                             READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/session20-mini   2/2     2            2           11m
+
+NAME                                        DESIRED   CURRENT   READY   AGE
+replicaset.apps/session20-mini-68946db7dd   2         2         2       11m
 ```
 
 ---
 
-# Step 6 - Check Kubernetes
+## Step 4 — GitOps in Action: Scale via Git Commit
+
+Change `replicas: 2` → `replicas: 3` in `app/deployment.yaml`, then:
 
 ```bash
-kubectl get all -n session20
-```
-
-You should see:
-
-```text
-deployment.apps/session20-mini
-service/session20-mini
-pod/session20-mini-xxxxx
-pod/session20-mini-yyyyy
-```
-
----
-
-# Step 7 - Make a Git Change
-
-Change in the Git repository:
-
-```yaml
-replicas: 2
-```
-
-to:
-
-```yaml
-replicas: 3
-```
-
-Commit:
-
-```bash
-git add .
+git add app/deployment.yaml
 git commit -m "Scale application to three replicas"
 git push
 ```
 
-Watch:
+Watch ArgoCD sync:
 
 ```bash
 kubectl get deployment -n session20 -w
 ```
 
-Eventually:
+Expected result (within ~3 minutes):
 
 ```text
-READY   3/3
+NAME             READY   UP-TO-DATE   AVAILABLE
+session20-mini   3/3     3            3
 ```
-
-The change travelled through:
-
-```text
-Git
- |
- v
-Argo CD
- |
- v
-Kubernetes
-```
-
-That is GitOps.
 
 ---
 
-# Step 8 - Demonstrate Self-Healing
+## Step 5 — Demonstrate Self-Healing
 
-After Argo CD has synchronized:
-
-```bash
-kubectl scale deployment session20-mini \
-  -n session20 \
-  --replicas=1
-```
-
-Check:
+ArgoCD's `selfHeal: true` means any manual change is reconciled back to Git state.
 
 ```bash
-kubectl get deployment -n session20
+# Manual scale down (anti-GitOps)
+kubectl scale deployment session20-mini -n session20 --replicas=1
 ```
 
-Because Git still says:
-
-```text
-replicas: 3
-```
-
-and self-healing is enabled, Argo CD can reconcile the cluster back toward:
-
-```text
-replicas: 3
-```
+Because Git still says `replicas: 2`, ArgoCD reconciles the cluster back to 2 replicas.
 
 This demonstrates:
 
 ```text
-Git = desired state
+Git       = desired state
 Kubernetes = actual state
-Argo CD = reconciler
+ArgoCD    = reconciler
 ```
 
 ---
 
-# Step 9 - Observe the System
-
-Check application logs:
-
-```bash
-kubectl logs deployment/session20-mini -n session20
-```
-
-Check resources:
-
-```bash
-kubectl get pods -n session20
-```
-
-Check Argo CD:
-
-```bash
-kubectl get application session20-mini -n argocd
-```
-
----
-
-# Final Architecture
-
-```text
-              Developer
-                  |
-                  v
-               Git Repo
-                  |
-             desired state
-                  |
-                  v
-              Argo CD
-                  |
-             reconciliation
-                  |
-                  v
-            Kubernetes
-                  |
-          +-------+-------+
-          |               |
-      Deployment        Service
-          |
-        Pods
-```
-
----
-
-# Final Viva Questions
-
-Explain these in your own words:
-
-```text
-1. Monitoring vs Observability
-2. Metrics vs Logs vs Traces
-3. What is Prometheus?
-4. What is Grafana?
-5. What is GitOps?
-6. Why is Git called the source of truth?
-7. What does Argo CD do?
-8. What does "desired state" mean?
-9. What does "actual state" mean?
-10. What is reconciliation?
-11. What does self-healing mean in Argo CD?
-12. What happens when replicas change from 2 to 3 in Git?
-```
-
----
-
-# Cleanup
-
-Delete the application:
+## Cleanup
 
 ```bash
 kubectl delete -f app/argocd-application.yaml
-```
-
-Delete the cluster:
-
-```bash
-kind delete cluster --name session20
+kubectl delete namespace session20
+kubectl delete namespace argocd
 ```
 
 ---
 
-# Final Mental Model
+## Viva Answer Key
 
-Remember only this:
-
-```text
-METRICS -> numbers
-LOGS    -> events
-TRACES  -> request journey
-
-PROMETHEUS -> metrics
-GRAFANA    -> dashboards
-
-GIT        -> desired state
-ARGO CD    -> reconciliation
-KUBERNETES -> actual state
-```
-
-And the most important GitOps loop:
-
-```text
-        +------------------+
-        |       Git        |
-        | Desired State    |
-        +--------+---------+
-                 |
-                 v
-             Argo CD
-                 |
-                 v
-          Kubernetes
-          Actual State
-                 |
-                 |
-                 +-------> Compare
-                              |
-                              v
-                         Reconcile
-                              |
-                              +----> back to desired state
-```
+1. **Monitoring vs Observability** — Monitoring alerts on known thresholds; Observability explains unknown system behavior via metrics + logs + traces.
+2. **Metrics vs Logs vs Traces** — Numbers over time / Text events / Request paths across services.
+3. **Prometheus** — Open-source metrics scraper and time-series database; exposes PromQL.
+4. **Grafana** — Dashboard platform that visualizes data from Prometheus and other sources.
+5. **GitOps** — Operational model where Git is the single source of truth for cluster state.
+6. **Git as source of truth** — All infrastructure YAML is versioned in Git; no untracked kubectl changes.
+7. **ArgoCD** — Continuously compares Git desired state against cluster actual state, applies differences.
+8. **Desired State** — What the YAML in Git describes the system should look like.
+9. **Actual State** — What is currently running in the Kubernetes cluster right now.
+10. **Reconciliation** — Automatic process of applying differences to reach desired state.
+11. **Self-Healing** — ArgoCD reverts manual kubectl changes back to Git definition automatically.
+12. **Replicas 2→3 in Git** — ArgoCD detects the diff within 3 minutes, runs scale, cluster has 3 pods.
