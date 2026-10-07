@@ -1,6 +1,6 @@
 # Session 11: Kubernetes Services
 
-**Author:** [Your Name]
+**Author:** [Bharath Kadali]
 **Course:** SST DevOps & Cloud [SWE]
 **Session:** 11 - Kubernetes Services
 **Repository:** devops-heros / session-11-kubernetes-services
